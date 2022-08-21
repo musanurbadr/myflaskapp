@@ -165,10 +165,23 @@ def dashboard():
     #create cursor
     cur = mysql.connection.cursor()
 
-    #ger articles
+    #get articles
     result = cur.execute("SELECT * FROM articles")
 
-    articles
+    articles = cur .fetchall()
+
+    if result > 0:
+        return render_template('dashboard.html', articles=articles)
+    else:
+        msg ='No Articles Found'
+        return render_template('dashboard.html' , msg=msg)
+
+    #Close connection
+    cur.close()
+
+
+
+
     return render_template('dashboard.html')
 
 
