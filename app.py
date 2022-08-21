@@ -12,7 +12,7 @@ from unicodedata import name
 from unittest import result
 from urllib import request
 from flask import Flask , render_template, flash, redirect, url_for, session, request, logging 
-from data import Articles
+#from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators 
 from passlib.hash import sha256_crypt 
@@ -33,7 +33,7 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
 
-Articles =Articles()
+#Articles =Articles()
 
 
 #Index
@@ -50,15 +50,34 @@ def about ():
 #Articles
 @app.route('/articles')
 def articles():
-    return render_template('articles.html', articles= Articles)
+    # Create cursor
+    cur = mysql.connection.cursor()
 
+    # Get articles
+    result = cur.execute("SELECT * FROM articles")
+
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('articles.html', articles=articles)
+    else:
+        msg = 'No Articles Found'
+        return render_template('articles.html', msg=msg)
+    # Close connection
+    cur.close()
 
 #Single Article
 @app.route('/article/<string:id>/')
 def article(id):
-    return render_template('article.html', id=id)
+    # Create cursor
+    cur = mysql.connection.cursor()
 
+    # Get article
+    result = cur.execute("SELECT * FROM articles WHERE id = %s", [id])
 
+    article = cur.fetchone()
+
+    return render_template('article.html', article=article)
 
 # Register Form Class
 class RegisterForm(Form):
